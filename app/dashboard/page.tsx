@@ -7,11 +7,11 @@ import { collection, addDoc, getDocs, query, where, doc, getDoc, orderBy, writeB
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [username, setUsername] = useState('');
   const [profilePic, setProfilePic] = useState('');
@@ -19,8 +19,8 @@ export default function Dashboard() {
   const [language, setLanguage] = useState('JavaScript');
   const [code, setCode] = useState('');
   const [comment, setComment] = useState('');
-  const dropdownRef = useRef(null);
-  const notifRef = useRef(null);
+  const dropdownRef = useRef<any>(null);
+  const notifRef = useRef<any>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function Dashboard() {
       }
     });
 
-    const handleClickOutside = (e) => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setShowDropdown(false);
       }
@@ -50,7 +50,7 @@ export default function Dashboard() {
     };
   }, []);
 
-  const fetchProfile = async (uid) => {
+  const fetchProfile = async (uid: string) => {
     const docSnap = await getDoc(doc(db, 'users', uid));
     if (docSnap.exists()) {
       setUsername(docSnap.data().username || '');
@@ -58,7 +58,7 @@ export default function Dashboard() {
     }
   };
 
-  const fetchNotifications = async (uid) => {
+  const fetchNotifications = async (uid: string) => {
     try {
       const q = query(
         collection(db, 'notifications'),
@@ -66,7 +66,7 @@ export default function Dashboard() {
         orderBy('createdAt', 'desc')
       );
       const snapshot = await getDocs(q);
-      const notifs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      const notifs = snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
       setNotifications(notifs);
       setUnreadCount(notifs.filter((n: any) => !n.read).length);
     } catch (e) {
@@ -79,7 +79,7 @@ export default function Dashboard() {
     setUnreadCount(0);
     try {
       const batch = writeBatch(db);
-      notifications.forEach(n => {
+      notifications.forEach((n: any) => {
         if (!n.read) {
           batch.update(doc(db, 'notifications', n.id), { read: true });
         }
@@ -90,10 +90,10 @@ export default function Dashboard() {
     }
   };
 
-  const fetchProjects = async (uid) => {
+  const fetchProjects = async (uid: string) => {
     const q = query(collection(db, 'projects'), where('uid', '==', uid));
     const snapshot = await getDocs(q);
-    setProjects(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    setProjects(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
   };
 
   const handleCreateProject = async () => {
@@ -122,7 +122,6 @@ export default function Dashboard() {
 
   return (
     <main className="min-h-screen bg-black text-white p-8">
-      {/* Navbar */}
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-6">
           <h1 className="text-3xl font-bold">CodeTutor AI</h1>
@@ -135,7 +134,6 @@ export default function Dashboard() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Notifications Bell */}
           <div className="relative" ref={notifRef}>
             <button
               onClick={() => { setShowNotifs(!showNotifs); markNotifsRead(); }}
@@ -154,7 +152,7 @@ export default function Dashboard() {
                 {notifications.length === 0 ? (
                   <p className="px-4 py-3 text-gray-500 text-sm">No notifications yet</p>
                 ) : (
-                  notifications.map(n => (
+                  notifications.map((n: any) => (
                     <div key={n.id} className="px-4 py-3 hover:bg-gray-800 transition border-b border-gray-800">
                       <p className="text-white text-sm">{n.message}</p>
                       <p className="text-gray-500 text-xs mt-1">
@@ -169,7 +167,6 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Profile */}
           <div className="relative" ref={dropdownRef}>
             <div
               onClick={() => setShowDropdown(!showDropdown)}
@@ -213,7 +210,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Projects */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Your Projects</h2>
       </div>
@@ -226,7 +222,7 @@ export default function Dashboard() {
           <span className="text-lg font-semibold">New Project</span>
         </button>
 
-        {projects.map((project) => (
+        {projects.map((project: any) => (
           <div
             key={project.id}
             onClick={() => router.push(`/project/${project.id}`)}
@@ -245,7 +241,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
           <div className="bg-gray-900 rounded-xl p-8 w-full max-w-2xl flex flex-col gap-4">

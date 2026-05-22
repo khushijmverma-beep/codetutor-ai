@@ -6,13 +6,13 @@ import { onAuthStateChanged, updatePassword } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 export default function ProfilePage() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [username, setUsername] = useState('');
   const [profilePic, setProfilePic] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
-  const fileRef = useRef(null);
+  const fileRef = useRef<any>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -32,11 +32,11 @@ export default function ProfilePage() {
     return () => unsubscribe();
   }, []);
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onloadend = () => setProfilePic(reader.result);
+    reader.onloadend = () => setProfilePic(reader.result as string);
     reader.readAsDataURL(file);
   };
 
@@ -48,17 +48,17 @@ export default function ProfilePage() {
         profilePic,
         email: user.email,
       });
+      setMessage('Profile saved successfully!');
       if (newPassword) {
         await updatePassword(user, newPassword);
       }
-      setMessage('Profile saved successfully!');
     } catch (error) {
-        if (newPassword) {
-          setMessage('Profile saved! Password update failed — try signing in with email first.');
-        } else {
-          setMessage('Error saving profile. Try again.');
-        }
+      if (newPassword) {
+        setMessage('Profile saved! Password update failed — try signing in with email first.');
+      } else {
+        setMessage('Error saving profile. Try again.');
       }
+    }
     setSaving(false);
   };
 
@@ -77,7 +77,6 @@ export default function ProfilePage() {
       </div>
 
       <div className="max-w-md flex flex-col gap-6">
-        {/* Profile Picture */}
         <div className="flex flex-col items-center gap-4">
           <div
             onClick={() => fileRef.current.click()}
@@ -99,7 +98,6 @@ export default function ProfilePage() {
           <p className="text-gray-500 text-sm">Click to upload profile picture</p>
         </div>
 
-        {/* Username */}
         <div className="flex flex-col gap-2">
           <label className="text-gray-400 text-sm">Username</label>
           <input
@@ -111,7 +109,6 @@ export default function ProfilePage() {
           />
         </div>
 
-        {/* Email (read only) */}
         <div className="flex flex-col gap-2">
           <label className="text-gray-400 text-sm">Email</label>
           <input
@@ -122,7 +119,6 @@ export default function ProfilePage() {
           />
         </div>
 
-        {/* Change Password */}
         <div className="flex flex-col gap-2">
           <label className="text-gray-400 text-sm">New Password (optional)</label>
           <input

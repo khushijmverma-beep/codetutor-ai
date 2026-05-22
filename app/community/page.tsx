@@ -16,19 +16,19 @@ const groq = new Groq({
 
 export default function CommunityPage() {
   const [user, setUser] = useState<any>(null);
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<any[]>([]);
   const [username, setUsername] = useState('');
   const [profilePic, setProfilePic] = useState('');
   const [loading, setLoading] = useState(true);
-  const [replyText, setReplyText] = useState({});
-  const [showReplies, setShowReplies] = useState({});
-  const [replies, setReplies] = useState({});
+  const [replyText, setReplyText] = useState<any>({});
+  const [showReplies, setShowReplies] = useState<any>({});
+  const [replies, setReplies] = useState<any>({});
   const [showPostModal, setShowPostModal] = useState(false);
   const [newCaption, setNewCaption] = useState('');
   const [newCode, setNewCode] = useState('');
   const [newLanguage, setNewLanguage] = useState('JavaScript');
   const [posting, setPosting] = useState(false);
-  const [likedPosts, setLikedPosts] = useState(new Set());
+  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const router = useRouter();
 
   useEffect(() => {
@@ -74,7 +74,7 @@ Return ONLY a JSON array, no extra text:
       const text = completion.choices[0]?.message?.content || '[]';
       const cleaned = text.replace(/```json|```/g, '').trim();
       const parsed = JSON.parse(cleaned);
-      return parsed.map((post, i) => ({
+      return parsed.map((post: any, i: number) => ({
         ...post,
         profilePic: '',
         isAI: true,
@@ -106,7 +106,7 @@ Return ONLY a JSON array, no extra text:
     setLoading(false);
   };
 
-  const handleLike = async (postId, isAI, postUid) => {
+  const handleLike = async (postId: string, isAI: boolean, postUid: string) => {
     if (likedPosts.has(postId)) return;
     setLikedPosts(prev => new Set([...prev, postId]));
     setPosts(prev =>
@@ -150,19 +150,19 @@ Return ONLY a JSON array, no extra text:
     setPosting(false);
   };
 
-  const fetchReplies = async (postId) => {
+  const fetchReplies = async (postId: string) => {
     if (postId.startsWith('ai-')) return;
     const q = query(collection(db, 'communityPosts', postId, 'replies'), orderBy('createdAt', 'asc'));
     const snapshot = await getDocs(q);
-    setReplies(prev => ({ ...prev, [postId]: snapshot.docs.map(d => ({ id: d.id, ...d.data() })) }));
+    setReplies((prev: any) => ({ ...prev, [postId]: snapshot.docs.map(d => ({ id: d.id, ...d.data() })) }));
   };
 
-  const toggleReplies = async (postId) => {
+  const toggleReplies = async (postId: string) => {
     if (!showReplies[postId]) await fetchReplies(postId);
-    setShowReplies(prev => ({ ...prev, [postId]: !prev[postId] }));
+    setShowReplies((prev: any) => ({ ...prev, [postId]: !prev[postId] }));
   };
 
-  const handleReply = async (postId) => {
+  const handleReply = async (postId: string) => {
     if (!replyText[postId]?.trim() || postId.startsWith('ai-')) return;
     await addDoc(collection(db, 'communityPosts', postId, 'replies'), {
       username: username || user.email,
@@ -170,7 +170,7 @@ Return ONLY a JSON array, no extra text:
       text: replyText[postId],
       createdAt: new Date(),
     });
-    const post = posts.find(p => p.id === postId);
+    const post = posts.find((p: any) => p.id === postId);
     if (post?.uid && post.uid !== user.uid) {
       await addDoc(collection(db, 'notifications'), {
         toUid: post.uid,
@@ -178,12 +178,12 @@ Return ONLY a JSON array, no extra text:
         createdAt: new Date(),
       });
     }
-    setReplyText(prev => ({ ...prev, [postId]: '' }));
+    setReplyText((prev: any) => ({ ...prev, [postId]: '' }));
     fetchReplies(postId);
-    setShowReplies(prev => ({ ...prev, [postId]: true }));
+    setShowReplies((prev: any) => ({ ...prev, [postId]: true }));
   };
 
-  const Avatar = ({ name, pic, size = 10 }) => (
+  const Avatar = ({ name, pic, size = 10 }: { name: string; pic: string; size?: number }) => (
     <div className={`w-${size} h-${size} rounded-full bg-gray-700 overflow-hidden flex items-center justify-center shrink-0`}>
       {pic
         ? <img src={pic} alt="Profile" className="w-full h-full object-cover" />
@@ -221,7 +221,7 @@ Return ONLY a JSON array, no extra text:
 
       <div className="max-w-2xl mx-auto flex flex-col gap-6">
         {loading && <p className="text-gray-400 animate-pulse">Loading community...</p>}
-        {posts.map((post) => (
+        {posts.map((post: any) => (
           <div key={post.id} className="bg-gray-900 rounded-xl p-6 flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <Avatar name={post.username} pic={post.profilePic} />
@@ -260,7 +260,7 @@ Return ONLY a JSON array, no extra text:
                   <p className="text-gray-500 text-sm italic">Replies not available for community posts.</p>
                 ) : (
                   <>
-                    {replies[post.id]?.map((reply) => (
+                    {replies[post.id]?.map((reply: any) => (
                       <div key={reply.id} className="flex gap-3">
                         <Avatar name={reply.username} pic={reply.profilePic} size={8} />
                         <div className="bg-gray-800 rounded-lg px-3 py-2 flex-1">
@@ -276,7 +276,7 @@ Return ONLY a JSON array, no extra text:
                           type="text"
                           placeholder="Write a reply..."
                           value={replyText[post.id] || ''}
-                          onChange={(e) => setReplyText(prev => ({ ...prev, [post.id]: e.target.value }))}
+                          onChange={(e) => setReplyText((prev: any) => ({ ...prev, [post.id]: e.target.value }))}
                           className="flex-1 bg-gray-800 text-white px-3 py-2 rounded-lg outline-none text-sm"
                           onKeyDown={(e) => e.key === 'Enter' && handleReply(post.id)}
                         />
