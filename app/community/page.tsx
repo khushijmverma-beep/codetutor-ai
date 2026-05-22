@@ -44,7 +44,7 @@ export default function CommunityPage() {
     return () => unsubscribe();
   }, []);
 
-  const fetchProfile = async (uid) => {
+  const fetchProfile = async (uid: string) => {
     const docSnap = await getDoc(doc(db, 'users', uid));
     if (docSnap.exists()) {
       setUsername(docSnap.data().username || '');
