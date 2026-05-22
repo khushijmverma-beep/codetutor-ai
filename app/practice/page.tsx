@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { auth, db } from '../../lib/firebase';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -11,7 +11,7 @@ const groq = new Groq({
   dangerouslyAllowBrowser: true
 });
 
-export default function PracticePage() {
+function PracticeContent() {
   const [user, setUser] = useState<any>(null);
   const [task, setTask] = useState('');
   const [taskLoading, setTaskLoading] = useState(true);
@@ -114,10 +114,7 @@ export default function PracticePage() {
   return (
     <main className="min-h-screen bg-black text-white p-8">
       <div className="flex items-center gap-4 mb-6">
-        <button
-          onClick={() => router.back()}
-          className="text-gray-400 hover:text-white transition"
-        >
+        <button onClick={() => router.back()} className="text-gray-400 hover:text-white transition">
           ← Back
         </button>
         <h1 className="text-2xl font-bold">Practice: {topic}</h1>
@@ -132,10 +129,7 @@ export default function PracticePage() {
           <div className="bg-gray-900 rounded-xl overflow-hidden">
             <div className="bg-gray-800 px-4 py-2 text-gray-400 text-sm flex justify-between items-center">
               <span>Your Task</span>
-              <button
-                onClick={generateTask}
-                className="text-xs text-gray-400 hover:text-white transition"
-              >
+              <button onClick={generateTask} className="text-xs text-gray-400 hover:text-white transition">
                 🔄 New Task
               </button>
             </div>
@@ -149,9 +143,7 @@ export default function PracticePage() {
           </div>
 
           <div className="bg-gray-900 rounded-xl overflow-hidden">
-            <div className="bg-gray-800 px-4 py-2 text-gray-400 text-sm">
-              Your Code
-            </div>
+            <div className="bg-gray-800 px-4 py-2 text-gray-400 text-sm">Your Code</div>
             <textarea
               value={userCode}
               onChange={(e) => setUserCode(e.target.value)}
@@ -170,19 +162,13 @@ export default function PracticePage() {
         </div>
 
         <div className="bg-gray-900 rounded-xl overflow-hidden">
-          <div className="bg-gray-800 px-4 py-2 text-gray-400 text-sm">
-            AI Feedback
-          </div>
+          <div className="bg-gray-800 px-4 py-2 text-gray-400 text-sm">AI Feedback</div>
           <div className="p-4">
-            {feedbackLoading && (
-              <p className="text-gray-400 animate-pulse">Reviewing your code...</p>
-            )}
+            {feedbackLoading && <p className="text-gray-400 animate-pulse">Reviewing your code...</p>}
             {!feedback && !feedbackLoading && (
               <p className="text-gray-500 text-sm">Submit your code to get AI feedback here.</p>
             )}
-            {feedback && (
-              <div className="text-white text-sm whitespace-pre-wrap">{feedback}</div>
-            )}
+            {feedback && <div className="text-white text-sm whitespace-pre-wrap">{feedback}</div>}
           </div>
 
           {feedback && (
@@ -204,5 +190,13 @@ export default function PracticePage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function PracticePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>}>
+      <PracticeContent />
+    </Suspense>
   );
 }
