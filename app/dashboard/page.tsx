@@ -68,7 +68,7 @@ export default function Dashboard() {
       const snapshot = await getDocs(q);
       const notifs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       setNotifications(notifs);
-      setUnreadCount(notifs.filter(n => !n.read).length);
+      setUnreadCount(notifs.filter((n: any) => !n.read).length);
     } catch (e) {
       console.error('Notif error:', e);
     }
