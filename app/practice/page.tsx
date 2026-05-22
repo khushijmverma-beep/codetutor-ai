@@ -12,7 +12,7 @@ const groq = new Groq({
 });
 
 export default function PracticePage() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [task, setTask] = useState('');
   const [taskLoading, setTaskLoading] = useState(true);
   const [userCode, setUserCode] = useState('');

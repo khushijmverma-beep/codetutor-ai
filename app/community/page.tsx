@@ -15,7 +15,7 @@ const groq = new Groq({
 });
 
 export default function CommunityPage() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [posts, setPosts] = useState([]);
   const [username, setUsername] = useState('');
   const [profilePic, setProfilePic] = useState('');

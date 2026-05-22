@@ -13,7 +13,7 @@ const groq = new Groq({
 });
 
 export default function ProjectPage() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [project, setProject] = useState(null);
   const [explanations, setExplanations] = useState({});
   const [loading, setLoading] = useState(null);

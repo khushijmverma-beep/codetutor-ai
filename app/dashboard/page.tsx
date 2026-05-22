@@ -6,7 +6,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc, getDocs, query, where, doc, getDoc, orderBy, writeBatch } from 'firebase/firestore';
 
 export default function Dashboard() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [projects, setProjects] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
